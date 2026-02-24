@@ -1,0 +1,126 @@
+{
+  "common": {
+    "appName": "Know Your Code",
+    "tagline": "Rozuměj svému kódu",
+    "loading": "Načítání...",
+    "error": "Něco se pokazilo",
+    "retry": "Zkusit znovu",
+    "save": "Uložit",
+    "cancel": "Zrušit",
+    "back": "Zpět",
+    "next": "Další",
+    "previous": "Předchozí",
+    "continue": "Pokračovat",
+    "complete": "Dokončit",
+    "lesson": "Lekce",
+    "lessons": "Lekce",
+    "course": "Kurz",
+    "courses": "Kurzy"
+  },
+  "nav": {
+    "home": "Domů",
+    "learn": "Učit se",
+    "profile": "Profil",
+    "login": "Přihlásit se",
+    "register": "Registrace",
+    "logout": "Odhlásit se"
+  },
+  "landing": {
+    "hero": {
+      "title": "Rozuměj kódu, který AI generuje",
+      "subtitle": "Nauč se základy webového vývoje a pochop, co tvůj kód skutečně dělá",
+      "cta": "Začít zdarma",
+      "secondaryCta": "Prohlédnout kurzy"
+    },
+    "features": {
+      "title": "Proč Know Your Code?",
+      "interactive": {
+        "title": "Interaktivní lekce",
+        "description": "Každá lekce končí kvízem, který ověří, že látku skutečně chápeš"
+      },
+      "practical": {
+        "title": "Praktické příklady",
+        "description": "Učíme tě na reálných příkladech kódu, které AI běžně generuje"
+      },
+      "progress": {
+        "title": "Sledování pokroku",
+        "description": "Vidíš svůj pokrok a víš, kde jsi skončil"
+      }
+    },
+    "courses": {
+      "title": "Kde začít?",
+      "subtitle": "Vyber si kurz podle svých znalostí"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Přihlášení",
+      "subtitle": "Vítej zpět! Přihlas se ke svému účtu.",
+      "email": "E-mail",
+      "password": "Heslo",
+      "submit": "Přihlásit se",
+      "noAccount": "Nemáš účet?",
+      "register": "Zaregistruj se",
+      "orContinueWith": "nebo pokračuj přes",
+      "forgotPassword": "Zapomněl jsi heslo?"
+    },
+    "register": {
+      "title": "Registrace",
+      "subtitle": "Vytvoř si účet a začni se učit.",
+      "email": "E-mail",
+      "password": "Heslo",
+      "confirmPassword": "Potvrď heslo",
+      "submit": "Vytvořit účet",
+      "hasAccount": "Už máš účet?",
+      "login": "Přihlas se",
+      "orContinueWith": "nebo pokračuj přes"
+    },
+    "errors": {
+      "invalidCredentials": "Nesprávný e-mail nebo heslo",
+      "emailInUse": "Tento e-mail je již zaregistrován",
+      "weakPassword": "Heslo musí mít alespoň 6 znaků",
+      "passwordMismatch": "Hesla se neshodují",
+      "generic": "Něco se pokazilo, zkus to znovu"
+    }
+  },
+  "learn": {
+    "title": "Kurzy",
+    "subtitle": "Vyber si kurz a začni se učit",
+    "startCourse": "Začít kurz",
+    "continueCourse": "Pokračovat",
+    "completed": "Dokončeno",
+    "progress": "{completed} z {total} lekcí",
+    "courseOverview": "Přehled kurzu",
+    "lessonsInCourse": "Lekce v kurzu",
+    "startLesson": "Začít lekci",
+    "continueLesson": "Pokračovat v lekci",
+    "lessonCompleted": "Lekce dokončena",
+    "nextLesson": "Další lekce",
+    "backToCourse": "Zpět na kurz"
+  },
+  "quiz": {
+    "title": "Kvíz",
+    "question": "Otázka {current} z {total}",
+    "checkAnswer": "Zkontrolovat odpověď",
+    "correct": "Správně!",
+    "incorrect": "Špatně",
+    "explanation": "Vysvětlení",
+    "nextQuestion": "Další otázka",
+    "finish": "Dokončit kvíz",
+    "results": {
+      "title": "Výsledky kvízu",
+      "score": "Tvé skóre: {score}%",
+      "perfect": "Výborně! Máš 100%!",
+      "good": "Skvělá práce!",
+      "needsWork": "Zkus si lekci ještě jednou přečíst."
+    }
+  },
+  "profile": {
+    "title": "Můj profil",
+    "progress": "Můj pokrok",
+    "settings": "Nastavení",
+    "language": "Jazyk",
+    "completedLessons": "Dokončené lekce",
+    "totalProgress": "Celkový pokrok"
+  }
+}

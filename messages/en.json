@@ -1,0 +1,126 @@
+{
+  "common": {
+    "appName": "Know Your Code",
+    "tagline": "Understand your code",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "continue": "Continue",
+    "complete": "Complete",
+    "lesson": "Lesson",
+    "lessons": "Lessons",
+    "course": "Course",
+    "courses": "Courses"
+  },
+  "nav": {
+    "home": "Home",
+    "learn": "Learn",
+    "profile": "Profile",
+    "login": "Log in",
+    "register": "Sign up",
+    "logout": "Log out"
+  },
+  "landing": {
+    "hero": {
+      "title": "Understand the code AI generates",
+      "subtitle": "Learn web development basics and understand what your code actually does",
+      "cta": "Start for free",
+      "secondaryCta": "Browse courses"
+    },
+    "features": {
+      "title": "Why Know Your Code?",
+      "interactive": {
+        "title": "Interactive lessons",
+        "description": "Each lesson ends with a quiz to verify you truly understand the material"
+      },
+      "practical": {
+        "title": "Practical examples",
+        "description": "We teach you with real code examples that AI commonly generates"
+      },
+      "progress": {
+        "title": "Progress tracking",
+        "description": "See your progress and know where you left off"
+      }
+    },
+    "courses": {
+      "title": "Where to start?",
+      "subtitle": "Choose a course based on your knowledge level"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "subtitle": "Welcome back! Sign in to your account.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "noAccount": "Don't have an account?",
+      "register": "Sign up",
+      "orContinueWith": "or continue with",
+      "forgotPassword": "Forgot password?"
+    },
+    "register": {
+      "title": "Sign up",
+      "subtitle": "Create an account and start learning.",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "login": "Log in",
+      "orContinueWith": "or continue with"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailInUse": "This email is already registered",
+      "weakPassword": "Password must be at least 6 characters",
+      "passwordMismatch": "Passwords don't match",
+      "generic": "Something went wrong, please try again"
+    }
+  },
+  "learn": {
+    "title": "Courses",
+    "subtitle": "Choose a course and start learning",
+    "startCourse": "Start course",
+    "continueCourse": "Continue",
+    "completed": "Completed",
+    "progress": "{completed} of {total} lessons",
+    "courseOverview": "Course overview",
+    "lessonsInCourse": "Lessons in this course",
+    "startLesson": "Start lesson",
+    "continueLesson": "Continue lesson",
+    "lessonCompleted": "Lesson completed",
+    "nextLesson": "Next lesson",
+    "backToCourse": "Back to course"
+  },
+  "quiz": {
+    "title": "Quiz",
+    "question": "Question {current} of {total}",
+    "checkAnswer": "Check answer",
+    "correct": "Correct!",
+    "incorrect": "Incorrect",
+    "explanation": "Explanation",
+    "nextQuestion": "Next question",
+    "finish": "Finish quiz",
+    "results": {
+      "title": "Quiz Results",
+      "score": "Your score: {score}%",
+      "perfect": "Excellent! You got 100%!",
+      "good": "Great job!",
+      "needsWork": "Try reading the lesson again."
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "progress": "My Progress",
+    "settings": "Settings",
+    "language": "Language",
+    "completedLessons": "Completed lessons",
+    "totalProgress": "Total progress"
+  }
+}
