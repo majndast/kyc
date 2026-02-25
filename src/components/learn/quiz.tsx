@@ -1,19 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/lib/i18n/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { CodeBlock } from './code-block'
+import { Confetti } from '@/components/ui/confetti'
 import { QuizQuestion, QuizOption } from '@/lib/supabase/types'
 import { cn } from '@/lib/utils'
-import { CheckCircle2, XCircle, ArrowRight, Trophy, Zap } from 'lucide-react'
+import { CheckCircle2, XCircle, ArrowRight, Trophy, Zap, Heart, Sparkles } from 'lucide-react'
 import { useGamificationStore } from '@/lib/stores/gamification-store'
 import { calculateXpForQuiz } from '@/lib/gamification/xp-config'
+import { soundManager } from '@/lib/sounds/sound-manager'
 
 interface QuizProps {
   questions: QuizQuestion[]
@@ -46,6 +46,9 @@ export function Quiz({
   const [finalScore, setFinalScore] = useState(initialScore)
   const [saving, setSaving] = useState(false)
   const [xpEarned, setXpEarned] = useState<number | null>(null)
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [hearts, setHearts] = useState(5)
+  const [shake, setShake] = useState(false)
 
   const addXp = useGamificationStore((state) => state.addXp)
 
@@ -55,14 +58,31 @@ export function Quiz({
   const explanation =
     locale === 'cs' ? question.explanation_cs : question.explanation_en
 
+  const progress = ((currentQuestion + (isAnswered ? 1 : 0)) / questions.length) * 100
+
+  const handleSelectAnswer = (index: number) => {
+    if (isAnswered) return
+    soundManager.play('click')
+    setSelectedAnswer(index)
+  }
+
   const handleCheckAnswer = () => {
     if (selectedAnswer === null) return
 
     const isCorrect = options[selectedAnswer].is_correct
-    if (isCorrect) {
-      setCorrectAnswers((prev) => prev + 1)
-    }
     setIsAnswered(true)
+
+    if (isCorrect) {
+      soundManager.play('correct')
+      setCorrectAnswers((prev) => prev + 1)
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 1500)
+    } else {
+      soundManager.play('wrong')
+      setHearts((prev) => Math.max(0, prev - 1))
+      setShake(true)
+      setTimeout(() => setShake(false), 500)
+    }
   }
 
   const handleNextQuestion = async () => {
@@ -80,6 +100,10 @@ export function Quiz({
       setFinalScore(score)
       setIsCompleted(true)
 
+      // Play completion sound
+      soundManager.play('complete')
+      setShowConfetti(true)
+
       // Calculate XP earned
       const earnedXp = calculateXpForQuiz(score)
       setXpEarned(earnedXp)
@@ -88,14 +112,12 @@ export function Quiz({
       if (isLoggedIn) {
         setSaving(true)
         try {
-          // Save progress
           await fetch('/api/progress', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lessonId, quizScore: score }),
           })
 
-          // Earn XP
           const xpResponse = await fetch('/api/gamification/earn-xp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -108,167 +130,233 @@ export function Quiz({
 
           if (xpResponse.ok) {
             const xpData = await xpResponse.json()
-            // Update local store with total XP gained (including streak bonus)
-            addXp(xpData.data.totalXpGained, xpData.data.xpGained === earnedXp ? 'quiz' : 'quiz_with_streak')
+            addXp(xpData.data.totalXpGained, 'quiz')
           }
         } catch (error) {
           console.error('Failed to save progress:', error)
         }
         setSaving(false)
       } else {
-        // Still show XP animation for non-logged users (local only)
         addXp(earnedXp, 'quiz')
       }
     }
   }
 
+  // Completed state
   if (isCompleted && finalScore !== null) {
+    const isPerfect = finalScore === 100
+    const isGood = finalScore >= 70
+
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <Trophy className="h-12 w-12 mx-auto text-yellow-500 mb-4" />
-          <CardTitle>{t('results.title')}</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center space-y-4">
-          <div className="text-4xl font-bold">
-            {t('results.score', { score: finalScore })}
-          </div>
-          <p className="text-muted-foreground">
-            {finalScore === 100
-              ? t('results.perfect')
-              : finalScore >= 70
-              ? t('results.good')
-              : t('results.needsWork')}
-          </p>
-
-          {xpEarned !== null && (
-            <div className="flex items-center justify-center gap-2 py-2">
-              <div className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold text-lg">
-                <Zap className="h-5 w-5 fill-current" />
-                <span>+{xpEarned} XP</span>
-              </div>
+      <>
+        <Confetti active={showConfetti} />
+        <Card className="overflow-hidden">
+          <div className={cn(
+            'h-2',
+            isPerfect ? 'bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500' :
+            isGood ? 'bg-gradient-to-r from-green-400 to-emerald-500' :
+            'bg-gradient-to-r from-blue-400 to-indigo-500'
+          )} />
+          <CardContent className="pt-8 pb-8 text-center space-y-6">
+            <div className={cn(
+              'mx-auto w-24 h-24 rounded-full flex items-center justify-center',
+              isPerfect ? 'bg-yellow-100 dark:bg-yellow-900/30' :
+              isGood ? 'bg-green-100 dark:bg-green-900/30' :
+              'bg-blue-100 dark:bg-blue-900/30'
+            )}>
+              {isPerfect ? (
+                <Sparkles className="h-12 w-12 text-yellow-500 animate-pulse" />
+              ) : (
+                <Trophy className={cn(
+                  'h-12 w-12',
+                  isGood ? 'text-green-500' : 'text-blue-500'
+                )} />
+              )}
             </div>
-          )}
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-            {nextLessonSlug && (
-              <Button asChild>
-                <Link href={`/learn/${courseSlug}/${nextLessonSlug}`}>
-                  {t('nextQuestion')} <ArrowRight className="ml-2 h-4 w-4" />
+            <div>
+              <h2 className="text-2xl font-bold mb-2">{t('results.title')}</h2>
+              <div className={cn(
+                'text-5xl font-bold mb-2',
+                isPerfect ? 'text-yellow-500' :
+                isGood ? 'text-green-500' :
+                'text-blue-500'
+              )}>
+                {finalScore}%
+              </div>
+              <p className="text-muted-foreground text-lg">
+                {isPerfect
+                  ? t('results.perfect')
+                  : isGood
+                  ? t('results.good')
+                  : t('results.needsWork')}
+              </p>
+            </div>
+
+            {xpEarned !== null && (
+              <div className="flex items-center justify-center">
+                <div className={cn(
+                  'flex items-center gap-2 px-6 py-3 rounded-full font-bold text-xl',
+                  'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
+                  'animate-xp-pop'
+                )}>
+                  <Zap className="h-6 w-6 fill-current" />
+                  <span>+{xpEarned} XP</span>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+              {nextLessonSlug && (
+                <Button size="lg" asChild className="text-lg px-8">
+                  <Link href={`/learn/${courseSlug}/${nextLessonSlug}`}>
+                    {locale === 'cs' ? 'Další lekce' : 'Next Lesson'}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              )}
+              <Button variant="outline" size="lg" asChild>
+                <Link href={`/learn/${courseSlug}`}>
+                  {locale === 'cs' ? 'Zpět na kurz' : 'Back to course'}
                 </Link>
               </Button>
-            )}
-            <Button variant="outline" asChild>
-              <Link href={`/learn/${courseSlug}`}>
-                {locale === 'cs' ? 'Zpět na kurz' : 'Back to course'}
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
+      </>
     )
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between mb-2">
-          <CardTitle>{t('title')}</CardTitle>
-          <span className="text-sm text-muted-foreground">
-            {t('question', {
-              current: currentQuestion + 1,
-              total: questions.length,
-            })}
-          </span>
-        </div>
-        <Progress
-          value={((currentQuestion + 1) / questions.length) * 100}
-          className="h-2"
-        />
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <p className="text-lg font-medium">{questionText}</p>
-
-          {question.code_snippet && (
-            <CodeBlock code={question.code_snippet} className="my-4" />
-          )}
-        </div>
-
-        <RadioGroup
-          value={selectedAnswer?.toString()}
-          onValueChange={(value) => setSelectedAnswer(parseInt(value))}
-          disabled={isAnswered}
-          className="space-y-3"
-        >
-          {options.map((option, index) => {
-            const optionText = locale === 'cs' ? option.text_cs : option.text_en
-            const isSelected = selectedAnswer === index
-            const isCorrect = option.is_correct
-
-            let borderClass = ''
-            if (isAnswered) {
-              if (isCorrect) {
-                borderClass = 'border-green-500 bg-green-50 dark:bg-green-900/20'
-              } else if (isSelected && !isCorrect) {
-                borderClass = 'border-red-500 bg-red-50 dark:bg-red-900/20'
-              }
-            }
-
-            return (
-              <div
-                key={index}
-                className={cn(
-                  'flex items-center space-x-3 rounded-lg border p-4 cursor-pointer transition-colors',
-                  !isAnswered && 'hover:bg-accent',
-                  isSelected && !isAnswered && 'border-primary',
-                  borderClass
-                )}
-                onClick={() => !isAnswered && setSelectedAnswer(index)}
-              >
-                <RadioGroupItem
-                  value={index.toString()}
-                  id={`option-${index}`}
+    <>
+      <Confetti active={showConfetti} duration={1500} />
+      <Card className={cn(shake && 'animate-heart-shake')}>
+        {/* Progress header */}
+        <div className="p-4 border-b">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-muted-foreground">
+              {t('question', {
+                current: currentQuestion + 1,
+                total: questions.length,
+              })}
+            </span>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Heart
+                  key={i}
+                  className={cn(
+                    'h-5 w-5 transition-all',
+                    i < hearts
+                      ? 'text-red-500 fill-red-500'
+                      : 'text-gray-300 dark:text-gray-600'
+                  )}
                 />
-                <Label
-                  htmlFor={`option-${index}`}
-                  className="flex-1 cursor-pointer"
-                >
-                  {optionText}
-                </Label>
-                {isAnswered && isCorrect && (
-                  <CheckCircle2 className="h-5 w-5 text-green-500" />
-                )}
-                {isAnswered && isSelected && !isCorrect && (
-                  <XCircle className="h-5 w-5 text-red-500" />
-                )}
-              </div>
-            )
-          })}
-        </RadioGroup>
-
-        {isAnswered && explanation && (
-          <div className="p-4 rounded-lg bg-muted">
-            <p className="font-medium mb-1">{t('explanation')}:</p>
-            <p className="text-muted-foreground">{explanation}</p>
+              ))}
+            </div>
           </div>
-        )}
-
-        <div className="flex justify-end">
-          {!isAnswered ? (
-            <Button onClick={handleCheckAnswer} disabled={selectedAnswer === null}>
-              {t('checkAnswer')}
-            </Button>
-          ) : (
-            <Button onClick={handleNextQuestion} disabled={saving}>
-              {currentQuestion < questions.length - 1
-                ? t('nextQuestion')
-                : t('finish')}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          )}
+          <Progress value={progress} className="h-3" />
         </div>
-      </CardContent>
-    </Card>
+
+        <CardContent className="p-6 space-y-6">
+          {/* Question */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold leading-relaxed">{questionText}</h3>
+            {question.code_snippet && (
+              <CodeBlock code={question.code_snippet} className="my-4" />
+            )}
+          </div>
+
+          {/* Options */}
+          <div className="space-y-3">
+            {options.map((option, index) => {
+              const optionText = locale === 'cs' ? option.text_cs : option.text_en
+              const isSelected = selectedAnswer === index
+              const isCorrect = option.is_correct
+
+              let optionStyle = 'border-2 border-border hover:border-primary hover:bg-accent'
+
+              if (isAnswered) {
+                if (isCorrect) {
+                  optionStyle = 'border-2 border-green-500 bg-green-50 dark:bg-green-900/20'
+                } else if (isSelected && !isCorrect) {
+                  optionStyle = 'border-2 border-red-500 bg-red-50 dark:bg-red-900/20'
+                } else {
+                  optionStyle = 'border-2 border-border opacity-50'
+                }
+              } else if (isSelected) {
+                optionStyle = 'border-2 border-primary bg-primary/5'
+              }
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleSelectAnswer(index)}
+                  disabled={isAnswered}
+                  className={cn(
+                    'w-full p-4 rounded-xl text-left transition-all duration-200',
+                    'flex items-center justify-between gap-4',
+                    optionStyle,
+                    !isAnswered && 'cursor-pointer active:scale-[0.98]',
+                    isAnswered && 'cursor-default'
+                  )}
+                >
+                  <span className="font-medium">{optionText}</span>
+                  {isAnswered && isCorrect && (
+                    <CheckCircle2 className="h-6 w-6 text-green-500 flex-shrink-0" />
+                  )}
+                  {isAnswered && isSelected && !isCorrect && (
+                    <XCircle className="h-6 w-6 text-red-500 flex-shrink-0" />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Explanation */}
+          {isAnswered && explanation && (
+            <div className={cn(
+              'p-4 rounded-xl',
+              options[selectedAnswer!]?.is_correct
+                ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800'
+            )}>
+              <p className="font-medium mb-1">{t('explanation')}:</p>
+              <p className="text-muted-foreground">{explanation}</p>
+            </div>
+          )}
+
+          {/* Action button */}
+          <div className="pt-2">
+            {!isAnswered ? (
+              <Button
+                onClick={handleCheckAnswer}
+                disabled={selectedAnswer === null}
+                size="lg"
+                className="w-full text-lg h-14"
+              >
+                {t('checkAnswer')}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleNextQuestion}
+                disabled={saving}
+                size="lg"
+                className={cn(
+                  'w-full text-lg h-14',
+                  options[selectedAnswer!]?.is_correct
+                    ? 'bg-green-500 hover:bg-green-600'
+                    : ''
+                )}
+              >
+                {currentQuestion < questions.length - 1
+                  ? t('nextQuestion')
+                  : t('finish')}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </>
   )
 }

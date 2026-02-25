@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo not_installed:*)",
+      "Bash(supabase projects:*)",
+      "Bash(npx supabase:*)"
+    ]
+  }
+}
