@@ -4,7 +4,6 @@ import { useTranslations } from 'next-intl'
 import { Link, usePathname } from '@/lib/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { LanguageSwitcher } from './language-switcher'
-import { XpDisplay, StreakDisplay } from '@/components/gamification'
 import { Code2, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -56,12 +55,6 @@ export function Header({ user, showAuthButtons = true }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          {user && (
-            <>
-              <XpDisplay className="hidden sm:flex" />
-              <StreakDisplay className="hidden sm:flex" />
-            </>
-          )}
           <LanguageSwitcher />
 
           {showAuthButtons && (
@@ -103,12 +96,6 @@ export function Header({ user, showAuthButtons = true }: HeaderProps) {
       {mobileMenuOpen && (
         <div className="md:hidden border-t">
           <nav className="container mx-auto flex flex-col gap-2 p-4">
-            {user && (
-              <div className="flex items-center gap-2 px-3 py-2 mb-2 border-b pb-4">
-                <XpDisplay />
-                <StreakDisplay />
-              </div>
-            )}
             {navItems.map((item) => (
               <Link
                 key={item.href}
