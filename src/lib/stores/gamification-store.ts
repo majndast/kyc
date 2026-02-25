@@ -186,6 +186,22 @@ export const useGamificationStore = create<GamificationState>()(
     }),
     {
       name: 'kyc-gamification',
+      partialize: (state) => ({
+        // Only persist these fields - exclude _hasHydrated, UI state, and actions
+        totalXp: state.totalXp,
+        currentLevel: state.currentLevel,
+        dailyXp: state.dailyXp,
+        dailyGoal: state.dailyGoal,
+        dailyGoalMet: state.dailyGoalMet,
+        lastDailyReset: state.lastDailyReset,
+        currentStreak: state.currentStreak,
+        longestStreak: state.longestStreak,
+        lastActivityDate: state.lastActivityDate,
+        streakFreezes: state.streakFreezes,
+        hearts: state.hearts,
+        maxHearts: state.maxHearts,
+        lastHeartRegen: state.lastHeartRegen,
+      }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true)
       },
