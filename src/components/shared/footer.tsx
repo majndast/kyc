@@ -3,7 +3,6 @@ import { Code2 } from 'lucide-react'
 
 export function Footer() {
   const t = useTranslations('common')
-  const year = new Date().getFullYear()
 
   return (
     <footer className="border-t bg-muted/50">
@@ -14,7 +13,7 @@ export function Footer() {
             <span className="font-medium">{t('appName')}</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            &copy; {year} {t('appName')}. All rights reserved.
+            &copy; 2025 {t('appName')}. All rights reserved.
           </p>
         </div>
       </div>
