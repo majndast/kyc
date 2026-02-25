@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useGamificationStore, selectXpProgress } from '@/lib/stores/gamification-store'
 import { cn } from '@/lib/utils'
 import { Zap } from 'lucide-react'
@@ -19,9 +20,18 @@ interface XpDisplayProps {
 
 export function XpDisplay({ className, showProgress = false }: XpDisplayProps) {
   const t = useTranslations('gamification')
+  const [mounted, setMounted] = useState(false)
   const totalXp = useGamificationStore((state) => state.totalXp)
   const currentLevel = useGamificationStore((state) => state.currentLevel)
   const xpProgress = useGamificationStore(selectXpProgress)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Show 0 on server to avoid hydration mismatch
+  const displayXp = mounted ? totalXp : 0
+  const displayLevel = mounted ? currentLevel : 1
 
   return (
     <TooltipProvider>
@@ -34,13 +44,13 @@ export function XpDisplay({ className, showProgress = false }: XpDisplayProps) {
             )}
           >
             <Zap className="h-4 w-4 fill-current" />
-            <span>{totalXp}</span>
+            <span>{displayXp}</span>
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="w-48">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>{t('level')} {currentLevel}</span>
+              <span>{t('level')} {displayLevel}</span>
               <span className="text-muted-foreground">
                 {xpProgress.current}/{xpProgress.needed} XP
               </span>

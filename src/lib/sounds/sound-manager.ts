@@ -1,6 +1,6 @@
 'use client'
 
-class SoundManager {
+class SoundManagerClass {
   private enabled: boolean = true
   private initialized: boolean = false
 
@@ -107,18 +107,16 @@ class SoundManager {
   }
 }
 
-let _soundManager: SoundManager | null = null
+let instance: SoundManagerClass | null = null
 
-export function getSoundManager(): SoundManager {
-  if (!_soundManager) {
-    _soundManager = new SoundManager()
+export function getSoundManager(): SoundManagerClass {
+  if (!instance) {
+    instance = new SoundManagerClass()
   }
-  return _soundManager
+  return instance
 }
 
-// For backwards compatibility, but only use on client
-export const soundManager = typeof window !== 'undefined' ? getSoundManager() : {
-  play: () => {},
-  toggle: () => true,
-  isEnabled: () => true,
+// Simple functions that can be called directly
+export const playSound = (sound: 'correct' | 'wrong' | 'levelup' | 'complete' | 'click') => {
+  getSoundManager().play(sound)
 }

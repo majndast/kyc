@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useGamificationStore, selectDailyProgress } from '@/lib/stores/gamification-store'
 import { DAILY_GOALS } from '@/lib/gamification/xp-config'
 import { Progress } from '@/components/ui/progress'
@@ -21,28 +22,36 @@ interface DailyGoalWidgetProps {
 
 export function DailyGoalWidget({ className, compact = false }: DailyGoalWidgetProps) {
   const t = useTranslations('gamification')
+  const [mounted, setMounted] = useState(false)
   const dailyProgress = useGamificationStore(selectDailyProgress)
   const dailyGoal = useGamificationStore((state) => state.dailyGoal)
   const setDailyGoal = useGamificationStore((state) => state.setDailyGoal)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const displayProgress = mounted ? dailyProgress : { current: 0, goal: 20, percentage: 0, met: false }
+  const displayGoal = mounted ? dailyGoal : 20
 
   if (compact) {
     return (
       <div
         className={cn(
           'flex items-center gap-1.5 px-2 py-1 rounded-full text-sm font-medium cursor-default',
-          dailyProgress.met
+          displayProgress.met
             ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
             : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
           className
         )}
       >
-        {dailyProgress.met ? (
+        {displayProgress.met ? (
           <Check className="h-4 w-4" />
         ) : (
           <Target className="h-4 w-4" />
         )}
         <span>
-          {dailyProgress.current}/{dailyProgress.goal}
+          {displayProgress.current}/{displayProgress.goal}
         </span>
       </div>
     )
@@ -52,7 +61,7 @@ export function DailyGoalWidget({ className, compact = false }: DailyGoalWidgetP
     <div className={cn('p-4 rounded-lg border bg-card', className)}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          {dailyProgress.met ? (
+          {displayProgress.met ? (
             <div className="p-1.5 rounded-full bg-green-100 dark:bg-green-900/30">
               <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
             </div>
@@ -67,7 +76,7 @@ export function DailyGoalWidget({ className, compact = false }: DailyGoalWidgetP
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="h-7 px-2">
-              {dailyGoal} XP
+              {displayGoal} XP
               <ChevronDown className="ml-1 h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
@@ -76,7 +85,7 @@ export function DailyGoalWidget({ className, compact = false }: DailyGoalWidgetP
               <DropdownMenuItem
                 key={goal}
                 onClick={() => setDailyGoal(goal)}
-                className={cn(goal === dailyGoal && 'bg-accent')}
+                className={cn(goal === displayGoal && 'bg-accent')}
               >
                 {goal} XP - {goal <= 10 ? t('casual') : goal <= 20 ? t('regular') : goal <= 30 ? t('serious') : t('intense')}
               </DropdownMenuItem>
@@ -87,22 +96,22 @@ export function DailyGoalWidget({ className, compact = false }: DailyGoalWidgetP
 
       <div className="space-y-2">
         <Progress
-          value={dailyProgress.percentage}
+          value={displayProgress.percentage}
           className={cn(
             'h-3',
-            dailyProgress.met && '[&>div]:bg-green-500'
+            displayProgress.met && '[&>div]:bg-green-500'
           )}
         />
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>
-            {dailyProgress.current} / {dailyProgress.goal} XP
+            {displayProgress.current} / {displayProgress.goal} XP
           </span>
-          {dailyProgress.met ? (
+          {displayProgress.met ? (
             <span className="text-green-600 dark:text-green-400 font-medium">
               {t('goalComplete')}
             </span>
           ) : (
-            <span>{dailyProgress.goal - dailyProgress.current} XP {t('remaining')}</span>
+            <span>{displayProgress.goal - displayProgress.current} XP {t('remaining')}</span>
           )}
         </div>
       </div>

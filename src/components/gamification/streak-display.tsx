@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useGamificationStore } from '@/lib/stores/gamification-store'
 import { getStreakMessage } from '@/lib/gamification/streak-service'
 import { cn } from '@/lib/utils'
@@ -19,11 +20,17 @@ interface StreakDisplayProps {
 export function StreakDisplay({ className }: StreakDisplayProps) {
   const t = useTranslations('gamification')
   const locale = useLocale() as 'cs' | 'en'
+  const [mounted, setMounted] = useState(false)
   const currentStreak = useGamificationStore((state) => state.currentStreak)
   const longestStreak = useGamificationStore((state) => state.longestStreak)
   const streakFreezes = useGamificationStore((state) => state.streakFreezes)
 
-  const isActive = currentStreak > 0
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const displayStreak = mounted ? currentStreak : 0
+  const isActive = displayStreak > 0
 
   return (
     <TooltipProvider>
@@ -44,16 +51,16 @@ export function StreakDisplay({ className }: StreakDisplayProps) {
                 isActive && 'fill-current animate-pulse'
               )}
             />
-            <span>{currentStreak}</span>
+            <span>{displayStreak}</span>
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="w-48">
           <div className="space-y-1">
-            <p className="font-medium">{getStreakMessage(currentStreak, locale)}</p>
+            <p className="font-medium">{getStreakMessage(displayStreak, locale)}</p>
             <p className="text-xs text-muted-foreground">
-              {t('longestStreak')}: {longestStreak} {t('days')}
+              {t('longestStreak')}: {mounted ? longestStreak : 0} {t('days')}
             </p>
-            {streakFreezes > 0 && (
+            {mounted && streakFreezes > 0 && (
               <p className="text-xs text-blue-500">
                 {t('streakFreezes')}: {streakFreezes}
               </p>
