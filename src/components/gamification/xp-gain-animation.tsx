@@ -1,70 +1,78 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGamificationStore } from '@/lib/stores/gamification-store'
 import { cn } from '@/lib/utils'
+
+interface DisplayedGain {
+  id: string
+  amount: number
+  visible: boolean
+}
 
 export function XpGainAnimation() {
   const pendingXpGains = useGamificationStore((state) => state.pendingXpGains)
   const consumeXpGain = useGamificationStore((state) => state.consumeXpGain)
-  const [displayedGains, setDisplayedGains] = useState<
-    Array<{ id: string; amount: number; visible: boolean }>
-  >([])
+  const [displayedGains, setDisplayedGains] = useState<DisplayedGain[]>([])
+  const processedIds = useRef<Set<string>>(new Set())
 
   useEffect(() => {
-    if (pendingXpGains.length === 0) return
-
+    // Find new gains that haven't been processed
     const newGains = pendingXpGains.filter(
-      (g) => !displayedGains.some((d) => d.id === g.id)
+      (g) => !processedIds.current.has(g.id)
     )
 
     if (newGains.length === 0) return
 
-    // Add new gains to display
+    // Mark as processed immediately
+    newGains.forEach((g) => {
+      processedIds.current.add(g.id)
+      consumeXpGain(g.id)
+    })
+
+    // Add to display
     setDisplayedGains((prev) => [
       ...prev,
       ...newGains.map((g) => ({ id: g.id, amount: g.amount, visible: true })),
     ])
 
-    // Consume from store immediately
-    newGains.forEach((g) => consumeXpGain(g.id))
-
-    // Animate out after delay
-    const timeoutId = setTimeout(() => {
+    // Schedule hide animation
+    const hideTimeout = setTimeout(() => {
       setDisplayedGains((prev) =>
         prev.map((g) =>
           newGains.some((ng) => ng.id === g.id) ? { ...g, visible: false } : g
         )
       )
-    }, 1500)
+    }, 2000)
 
-    // Remove from display after animation
-    const cleanupId = setTimeout(() => {
+    // Schedule removal
+    const removeTimeout = setTimeout(() => {
       setDisplayedGains((prev) =>
         prev.filter((g) => !newGains.some((ng) => ng.id === g.id))
       )
-    }, 2000)
+      // Clean up processed IDs
+      newGains.forEach((g) => processedIds.current.delete(g.id))
+    }, 2500)
 
     return () => {
-      clearTimeout(timeoutId)
-      clearTimeout(cleanupId)
+      clearTimeout(hideTimeout)
+      clearTimeout(removeTimeout)
     }
-  }, [pendingXpGains, consumeXpGain, displayedGains])
+  }, [pendingXpGains, consumeXpGain])
 
   if (displayedGains.length === 0) return null
 
   return (
-    <div className="fixed top-20 right-4 z-50 pointer-events-none">
-      {displayedGains.map((gain, index) => (
+    <div className="fixed top-20 right-4 z-50 pointer-events-none flex flex-col items-end gap-2">
+      {displayedGains.map((gain) => (
         <div
           key={gain.id}
           className={cn(
-            'mb-2 px-4 py-2 rounded-full bg-amber-500 text-white font-bold text-lg shadow-lg transition-all duration-500',
+            'px-4 py-2 rounded-full bg-amber-500 text-white font-bold text-lg shadow-lg transition-all duration-500 ease-out',
             gain.visible
-              ? 'opacity-100 translate-y-0'
-              : 'opacity-0 -translate-y-4'
+              ? 'opacity-100 translate-x-0 scale-100'
+              : 'opacity-0 translate-x-4 scale-95'
           )}
-          style={{ animationDelay: `${index * 100}ms` }}
         >
           +{gain.amount} XP
         </div>
