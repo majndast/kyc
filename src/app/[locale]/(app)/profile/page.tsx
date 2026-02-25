@@ -4,8 +4,10 @@ import { redirect } from '@/lib/i18n/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { BookOpen, Trophy, Target } from 'lucide-react'
+import { BookOpen, Trophy, Target, Zap, Flame } from 'lucide-react'
 import { Course } from '@/lib/supabase/types'
+import { DailyGoalWidget } from '@/components/gamification'
+import { getXpProgress } from '@/lib/gamification/xp-config'
 
 interface ProfilePageProps {
   params: Promise<{ locale: string }>
@@ -53,6 +55,31 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   const progress = (progressResult.data || []) as { lesson_id: string; completed: boolean; quiz_score: number | null }[]
 
+  // Fetch gamification profile data
+  interface GamificationProfile {
+    total_xp: number | null
+    current_level: number | null
+    current_streak: number | null
+    longest_streak: number | null
+  }
+  const profileResult = await supabase
+    .from('profiles')
+    .select('total_xp, current_level, current_streak, longest_streak')
+    .eq('id', user.id)
+    .single() as { data: GamificationProfile | null }
+
+  const gamificationData = profileResult.data || {
+    total_xp: 0,
+    current_level: 1,
+    current_streak: 0,
+    longest_streak: 0,
+  }
+
+  const xpProgress = getXpProgress(
+    gamificationData.total_xp || 0,
+    gamificationData.current_level || 1
+  )
+
   const completedLessonIds = new Set(progress.map((p) => p.lesson_id))
   const totalLessons = courses.reduce(
     (sum, c) => sum + (c.lessons?.length || 0),
@@ -74,7 +101,45 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         <p className="text-muted-foreground">{user.email}</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Level
+            </CardTitle>
+            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-white text-xs font-bold">
+              {gamificationData.current_level || 1}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold flex items-center gap-2">
+              <Zap className="h-5 w-5 text-amber-500" />
+              {gamificationData.total_xp || 0} XP
+            </div>
+            <Progress value={xpProgress.percentage} className="h-2 mt-2" />
+            <p className="text-xs text-muted-foreground mt-1">
+              {xpProgress.current} / {xpProgress.needed} XP
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Streak
+            </CardTitle>
+            <Flame className="h-4 w-4 text-orange-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {gamificationData.current_streak || 0} {locale === 'cs' ? 'dní' : 'days'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {locale === 'cs' ? 'Nejdelší' : 'Longest'}: {gamificationData.longest_streak || 0}
+            </p>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -86,37 +151,32 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             <div className="text-2xl font-bold">
               {completedTotal} / {totalLessons}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t('totalProgress')}
-            </CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+            <p className="text-xs text-muted-foreground">
               {totalLessons > 0
                 ? Math.round((completedTotal / totalLessons) * 100)
-                : 0}
-              %
-            </div>
+                : 0}% {locale === 'cs' ? 'hotovo' : 'complete'}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Average Quiz Score
+              {locale === 'cs' ? 'Průměrné skóre' : 'Avg. Quiz Score'}
             </CardTitle>
-            <Trophy className="h-4 w-4 text-muted-foreground" />
+            <Trophy className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{averageScore}%</div>
+            <p className="text-xs text-muted-foreground">
+              {progress.length} {locale === 'cs' ? 'kvízů' : 'quizzes'}
+            </p>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="mb-8">
+        <DailyGoalWidget />
       </div>
 
       <div className="space-y-6">

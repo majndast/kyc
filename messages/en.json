@@ -122,5 +122,37 @@
     "language": "Language",
     "completedLessons": "Completed lessons",
     "totalProgress": "Total progress"
+  },
+  "gamification": {
+    "level": "Level",
+    "xpToNextLevel": "{xp} XP to next level",
+    "dailyGoal": "Daily Goal",
+    "goalComplete": "Goal complete!",
+    "remaining": "remaining",
+    "casual": "Casual",
+    "regular": "Regular",
+    "serious": "Serious",
+    "intense": "Intense",
+    "longestStreak": "Longest streak",
+    "days": "days",
+    "streakFreezes": "Streak freezes",
+    "levelUp": "Level Up",
+    "reachedLevel": "You reached level {level}!",
+    "awesome": "Awesome!",
+    "streakModal": {
+      "newRecord": "New record!",
+      "dayStreak": "day streak",
+      "newRecordMessage": "You beat your personal record!",
+      "keepGoing": "Keep learning!",
+      "continue": "Continue",
+      "dontLoseStreak": "Don't lose your streak!",
+      "streakAtRisk": "Your {count} day streak is at risk!",
+      "startLesson": "Start a lesson",
+      "later": "Later",
+      "streakLost": "Streak lost",
+      "streakLostMessage": "Your {count} day streak was broken.",
+      "useStreakFreeze": "Use streak freeze",
+      "startFresh": "Start fresh"
+    }
   }
 }

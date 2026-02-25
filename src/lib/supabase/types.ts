@@ -14,16 +14,46 @@ export interface Database {
           id: string
           locale: string
           created_at: string
+          total_xp: number
+          current_level: number
+          daily_goal: number
+          current_streak: number
+          longest_streak: number
+          last_activity_date: string | null
+          streak_freezes: number
+          hearts: number
+          max_hearts: number
+          last_heart_regen: string | null
         }
         Insert: {
           id: string
           locale?: string
           created_at?: string
+          total_xp?: number
+          current_level?: number
+          daily_goal?: number
+          current_streak?: number
+          longest_streak?: number
+          last_activity_date?: string | null
+          streak_freezes?: number
+          hearts?: number
+          max_hearts?: number
+          last_heart_regen?: string | null
         }
         Update: {
           id?: string
           locale?: string
           created_at?: string
+          total_xp?: number
+          current_level?: number
+          daily_goal?: number
+          current_streak?: number
+          longest_streak?: number
+          last_activity_date?: string | null
+          streak_freezes?: number
+          hearts?: number
+          max_hearts?: number
+          last_heart_regen?: string | null
         }
       }
       courses: {
@@ -139,6 +169,7 @@ export interface Database {
           completed: boolean
           quiz_score: number | null
           completed_at: string | null
+          xp_earned: number
         }
         Insert: {
           id?: string
@@ -147,6 +178,7 @@ export interface Database {
           completed?: boolean
           quiz_score?: number | null
           completed_at?: string | null
+          xp_earned?: number
         }
         Update: {
           id?: string
@@ -155,6 +187,59 @@ export interface Database {
           completed?: boolean
           quiz_score?: number | null
           completed_at?: string | null
+          xp_earned?: number
+        }
+      }
+      daily_xp: {
+        Row: {
+          id: string
+          user_id: string
+          date: string
+          xp_earned: number
+          goal_met: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          date: string
+          xp_earned?: number
+          goal_met?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          date?: string
+          xp_earned?: number
+          goal_met?: boolean
+          created_at?: string
+        }
+      }
+      xp_transactions: {
+        Row: {
+          id: string
+          user_id: string
+          amount: number
+          source: string
+          source_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          amount: number
+          source: string
+          source_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          amount?: number
+          source?: string
+          source_id?: string | null
+          created_at?: string
         }
       }
     }
@@ -182,6 +267,8 @@ export type Lesson = Database['public']['Tables']['lessons']['Row']
 export type QuizQuestion = Database['public']['Tables']['quiz_questions']['Row']
 export type UserProgress = Database['public']['Tables']['user_progress']['Row']
 export type Profile = Database['public']['Tables']['profiles']['Row']
+export type DailyXp = Database['public']['Tables']['daily_xp']['Row']
+export type XpTransaction = Database['public']['Tables']['xp_transactions']['Row']
 
 // Extended types with relations
 export interface CourseWithLessons extends Course {

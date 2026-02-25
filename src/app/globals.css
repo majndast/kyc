@@ -124,3 +124,79 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Gamification animations */
+@keyframes xp-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes streak-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(251, 146, 60, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(251, 146, 60, 0.8);
+  }
+}
+
+@keyframes confetti {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes heart-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px) rotate(-5deg);
+  }
+  75% {
+    transform: translateX(4px) rotate(5deg);
+  }
+}
+
+@keyframes level-up-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.8);
+  }
+}
+
+.animate-xp-pop {
+  animation: xp-pop 0.5s ease-out;
+}
+
+.animate-streak-glow {
+  animation: streak-glow 2s ease-in-out infinite;
+}
+
+.animate-confetti {
+  animation: confetti 2s ease-out forwards;
+}
+
+.animate-heart-shake {
+  animation: heart-shake 0.5s ease-in-out;
+}
+
+.animate-level-up-glow {
+  animation: level-up-glow 2s ease-in-out infinite;
+}

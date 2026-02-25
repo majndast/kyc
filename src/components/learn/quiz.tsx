@@ -11,7 +11,9 @@ import { Progress } from '@/components/ui/progress'
 import { CodeBlock } from './code-block'
 import { QuizQuestion, QuizOption } from '@/lib/supabase/types'
 import { cn } from '@/lib/utils'
-import { CheckCircle2, XCircle, ArrowRight, Trophy } from 'lucide-react'
+import { CheckCircle2, XCircle, ArrowRight, Trophy, Zap } from 'lucide-react'
+import { useGamificationStore } from '@/lib/stores/gamification-store'
+import { calculateXpForQuiz } from '@/lib/gamification/xp-config'
 
 interface QuizProps {
   questions: QuizQuestion[]
@@ -43,6 +45,9 @@ export function Quiz({
   const [isCompleted, setIsCompleted] = useState(initialCompleted)
   const [finalScore, setFinalScore] = useState(initialScore)
   const [saving, setSaving] = useState(false)
+  const [xpEarned, setXpEarned] = useState<number | null>(null)
+
+  const addXp = useGamificationStore((state) => state.addXp)
 
   const question = questions[currentQuestion]
   const options = question.options as QuizOption[]
@@ -75,19 +80,44 @@ export function Quiz({
       setFinalScore(score)
       setIsCompleted(true)
 
+      // Calculate XP earned
+      const earnedXp = calculateXpForQuiz(score)
+      setXpEarned(earnedXp)
+
       // Save progress if logged in
       if (isLoggedIn) {
         setSaving(true)
         try {
+          // Save progress
           await fetch('/api/progress', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lessonId, quizScore: score }),
           })
+
+          // Earn XP
+          const xpResponse = await fetch('/api/gamification/earn-xp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lessonId,
+              quizScore: score,
+              source: 'quiz_complete',
+            }),
+          })
+
+          if (xpResponse.ok) {
+            const xpData = await xpResponse.json()
+            // Update local store with total XP gained (including streak bonus)
+            addXp(xpData.data.totalXpGained, xpData.data.xpGained === earnedXp ? 'quiz' : 'quiz_with_streak')
+          }
         } catch (error) {
           console.error('Failed to save progress:', error)
         }
         setSaving(false)
+      } else {
+        // Still show XP animation for non-logged users (local only)
+        addXp(earnedXp, 'quiz')
       }
     }
   }
@@ -110,6 +140,15 @@ export function Quiz({
               ? t('results.good')
               : t('results.needsWork')}
           </p>
+
+          {xpEarned !== null && (
+            <div className="flex items-center justify-center gap-2 py-2">
+              <div className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold text-lg">
+                <Zap className="h-5 w-5 fill-current" />
+                <span>+{xpEarned} XP</span>
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
             {nextLessonSlug && (

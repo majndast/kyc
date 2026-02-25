@@ -122,5 +122,37 @@
     "language": "Jazyk",
     "completedLessons": "Dokončené lekce",
     "totalProgress": "Celkový pokrok"
+  },
+  "gamification": {
+    "level": "Level",
+    "xpToNextLevel": "Ještě {xp} XP do dalšího levelu",
+    "dailyGoal": "Denní cíl",
+    "goalComplete": "Cíl splněn!",
+    "remaining": "zbývá",
+    "casual": "Rekreační",
+    "regular": "Pravidelný",
+    "serious": "Vážný",
+    "intense": "Intenzivní",
+    "longestStreak": "Nejdelší série",
+    "days": "dní",
+    "streakFreezes": "Zmrazení série",
+    "levelUp": "Level Up",
+    "reachedLevel": "Dosáhl jsi levelu {level}!",
+    "awesome": "Skvělé!",
+    "streakModal": {
+      "newRecord": "Nový rekord!",
+      "dayStreak": "denní série",
+      "newRecordMessage": "Překonal jsi svůj osobní rekord!",
+      "keepGoing": "Pokračuj v učení!",
+      "continue": "Pokračovat",
+      "dontLoseStreak": "Neztrať svou sérii!",
+      "streakAtRisk": "Tvá {count} denní série je v ohrožení!",
+      "startLesson": "Začít lekci",
+      "later": "Později",
+      "streakLost": "Série ztracena",
+      "streakLostMessage": "Tvá {count} denní série byla přerušena.",
+      "useStreakFreeze": "Použít zmrazení",
+      "startFresh": "Začít znovu"
+    }
   }
 }
