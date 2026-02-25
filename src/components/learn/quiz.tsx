@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 import { CheckCircle2, XCircle, ArrowRight, Trophy, Zap, Heart, Sparkles } from 'lucide-react'
 import { useGamificationStore } from '@/lib/stores/gamification-store'
 import { calculateXpForQuiz } from '@/lib/gamification/xp-config'
-import { soundManager } from '@/lib/sounds/sound-manager'
+import { getSoundManager } from '@/lib/sounds/sound-manager'
 
 interface QuizProps {
   questions: QuizQuestion[]
@@ -62,7 +62,7 @@ export function Quiz({
 
   const handleSelectAnswer = (index: number) => {
     if (isAnswered) return
-    soundManager.play('click')
+    getSoundManager().play('click')
     setSelectedAnswer(index)
   }
 
@@ -73,12 +73,12 @@ export function Quiz({
     setIsAnswered(true)
 
     if (isCorrect) {
-      soundManager.play('correct')
+      getSoundManager().play('correct')
       setCorrectAnswers((prev) => prev + 1)
       setShowConfetti(true)
       setTimeout(() => setShowConfetti(false), 1500)
     } else {
-      soundManager.play('wrong')
+      getSoundManager().play('wrong')
       setHearts((prev) => Math.max(0, prev - 1))
       setShake(true)
       setTimeout(() => setShake(false), 500)
@@ -101,7 +101,7 @@ export function Quiz({
       setIsCompleted(true)
 
       // Play completion sound
-      soundManager.play('complete')
+      getSoundManager().play('complete')
       setShowConfetti(true)
 
       // Calculate XP earned
