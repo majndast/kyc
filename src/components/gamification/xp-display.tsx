@@ -24,9 +24,10 @@ export function XpDisplay({ className, showProgress = false }: XpDisplayProps) {
   const currentLevel = useGamificationStore((state) => state.currentLevel)
   const xpProgress = useGamificationStore(selectXpProgress)
 
-  // Show 0 on server to avoid hydration mismatch
-  const displayXp = hasHydrated ? totalXp : 0
-  const displayLevel = hasHydrated ? currentLevel : 1
+  // Don't render until hydrated to avoid mismatch
+  if (!hasHydrated) {
+    return null
+  }
 
   return (
     <TooltipProvider>
@@ -39,13 +40,13 @@ export function XpDisplay({ className, showProgress = false }: XpDisplayProps) {
             )}
           >
             <Zap className="h-4 w-4 fill-current" />
-            <span>{displayXp}</span>
+            <span>{totalXp}</span>
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="w-48">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>{t('level')} {displayLevel}</span>
+              <span>{t('level')} {currentLevel}</span>
               <span className="text-muted-foreground">
                 {xpProgress.current}/{xpProgress.needed} XP
               </span>

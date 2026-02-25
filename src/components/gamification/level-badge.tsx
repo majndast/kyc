@@ -26,7 +26,9 @@ export function LevelBadge({ className, size = 'sm' }: LevelBadgeProps) {
   const hasHydrated = useGamificationStore((state) => state._hasHydrated)
   const currentLevel = useGamificationStore((state) => state.currentLevel)
 
-  const displayLevel = hasHydrated ? currentLevel : 1
+  if (!hasHydrated) {
+    return null
+  }
 
   return (
     <TooltipProvider>
@@ -39,11 +41,11 @@ export function LevelBadge({ className, size = 'sm' }: LevelBadgeProps) {
               className
             )}
           >
-            {displayLevel}
+            {currentLevel}
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{t('level')} {displayLevel}</p>
+          <p>{t('level')} {currentLevel}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -24,8 +24,11 @@ export function StreakDisplay({ className }: StreakDisplayProps) {
   const longestStreak = useGamificationStore((state) => state.longestStreak)
   const streakFreezes = useGamificationStore((state) => state.streakFreezes)
 
-  const displayStreak = hasHydrated ? currentStreak : 0
-  const isActive = displayStreak > 0
+  if (!hasHydrated) {
+    return null
+  }
+
+  const isActive = currentStreak > 0
 
   return (
     <TooltipProvider>
@@ -46,16 +49,16 @@ export function StreakDisplay({ className }: StreakDisplayProps) {
                 isActive && 'fill-current animate-pulse'
               )}
             />
-            <span>{displayStreak}</span>
+            <span>{currentStreak}</span>
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="w-48">
           <div className="space-y-1">
-            <p className="font-medium">{getStreakMessage(displayStreak, locale)}</p>
+            <p className="font-medium">{getStreakMessage(currentStreak, locale)}</p>
             <p className="text-xs text-muted-foreground">
-              {t('longestStreak')}: {hasHydrated ? longestStreak : 0} {t('days')}
+              {t('longestStreak')}: {longestStreak} {t('days')}
             </p>
-            {hasHydrated && streakFreezes > 0 && (
+            {streakFreezes > 0 && (
               <p className="text-xs text-blue-500">
                 {t('streakFreezes')}: {streakFreezes}
               </p>
