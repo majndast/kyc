@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { BookOpen, Trophy, Target, Zap, Flame } from 'lucide-react'
 import { Course } from '@/lib/supabase/types'
-import { DailyGoalWidget } from '@/components/gamification'
+// import { DailyGoalWidget } from '@/components/gamification'
 import { getXpProgress } from '@/lib/gamification/xp-config'
 
 interface ProfilePageProps {
@@ -173,10 +173,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             </p>
           </CardContent>
         </Card>
-      </div>
-
-      <div className="mb-8">
-        <DailyGoalWidget />
       </div>
 
       <div className="space-y-6">
