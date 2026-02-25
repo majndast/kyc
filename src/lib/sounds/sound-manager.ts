@@ -1,33 +1,33 @@
 'use client'
 
 class SoundManager {
-  private sounds: Map<string, HTMLAudioElement> = new Map()
   private enabled: boolean = true
+  private initialized: boolean = false
 
-  constructor() {
-    if (typeof window !== 'undefined') {
+  private init() {
+    if (this.initialized) return
+    if (typeof window === 'undefined') return
+
+    try {
       this.enabled = localStorage.getItem('kyc-sounds') !== 'false'
+      this.initialized = true
+    } catch {
+      this.enabled = true
+      this.initialized = true
     }
-  }
-
-  private getOrCreateAudio(name: string, src: string): HTMLAudioElement | null {
-    if (typeof window === 'undefined') return null
-
-    if (!this.sounds.has(name)) {
-      const audio = new Audio(src)
-      audio.preload = 'auto'
-      this.sounds.set(name, audio)
-    }
-    return this.sounds.get(name)!
   }
 
   play(sound: 'correct' | 'wrong' | 'levelup' | 'complete' | 'click') {
-    if (!this.enabled) return
-
-    // Use Web Audio API for simple sounds
     if (typeof window === 'undefined') return
 
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+    this.init()
+    if (!this.enabled) return
+
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+      if (!AudioContextClass) return
+
+      const ctx = new AudioContextClass()
     const oscillator = ctx.createOscillator()
     const gainNode = ctx.createGain()
 
@@ -88,6 +88,10 @@ class SoundManager {
         oscillator.start(ctx.currentTime)
         oscillator.stop(ctx.currentTime + 0.05)
         break
+    }
+    } catch (e) {
+      // Silently fail if audio doesn't work
+      console.debug('Sound playback failed:', e)
     }
   }
 
