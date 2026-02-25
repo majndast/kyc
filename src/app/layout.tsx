@@ -17,13 +17,19 @@ export const metadata: Metadata = {
   description: 'Rozuměj svému kódu - Edukační platforma pro vývojáře',
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+interface RootLayoutProps {
   children: React.ReactNode
-}>) {
+  params: Promise<{ locale?: string }>
+}
+
+export default async function RootLayout({
+  children,
+  params,
+}: RootLayoutProps) {
+  const { locale } = await params
+
   return (
-    <html suppressHydrationWarning>
+    <html lang={locale || 'cs'} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
