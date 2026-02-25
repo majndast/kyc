@@ -2,7 +2,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { locales, Locale } from '@/lib/i18n'
-import { GamificationProvider } from '@/components/gamification'
+import { ClientProviders } from '@/components/providers/client-providers'
 
 interface LocaleLayoutProps {
   children: React.ReactNode
@@ -29,9 +29,9 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <GamificationProvider>
+      <ClientProviders>
         {children}
-      </GamificationProvider>
+      </ClientProviders>
     </NextIntlClientProvider>
   )
 }
