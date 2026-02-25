@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useGamificationStore, selectDailyProgress } from '@/lib/stores/gamification-store'
 import { DAILY_GOALS } from '@/lib/gamification/xp-config'
 import { Progress } from '@/components/ui/progress'
@@ -22,17 +21,13 @@ interface DailyGoalWidgetProps {
 
 export function DailyGoalWidget({ className, compact = false }: DailyGoalWidgetProps) {
   const t = useTranslations('gamification')
-  const [mounted, setMounted] = useState(false)
+  const hasHydrated = useGamificationStore((state) => state._hasHydrated)
   const dailyProgress = useGamificationStore(selectDailyProgress)
   const dailyGoal = useGamificationStore((state) => state.dailyGoal)
   const setDailyGoal = useGamificationStore((state) => state.setDailyGoal)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const displayProgress = mounted ? dailyProgress : { current: 0, goal: 20, percentage: 0, met: false }
-  const displayGoal = mounted ? dailyGoal : 20
+  const displayProgress = hasHydrated ? dailyProgress : { current: 0, goal: 20, percentage: 0, met: false }
+  const displayGoal = hasHydrated ? dailyGoal : 20
 
   if (compact) {
     return (

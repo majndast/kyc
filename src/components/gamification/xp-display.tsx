@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useGamificationStore, selectXpProgress } from '@/lib/stores/gamification-store'
 import { cn } from '@/lib/utils'
 import { Zap } from 'lucide-react'
@@ -20,18 +19,14 @@ interface XpDisplayProps {
 
 export function XpDisplay({ className, showProgress = false }: XpDisplayProps) {
   const t = useTranslations('gamification')
-  const [mounted, setMounted] = useState(false)
+  const hasHydrated = useGamificationStore((state) => state._hasHydrated)
   const totalXp = useGamificationStore((state) => state.totalXp)
   const currentLevel = useGamificationStore((state) => state.currentLevel)
   const xpProgress = useGamificationStore(selectXpProgress)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   // Show 0 on server to avoid hydration mismatch
-  const displayXp = mounted ? totalXp : 0
-  const displayLevel = mounted ? currentLevel : 1
+  const displayXp = hasHydrated ? totalXp : 0
+  const displayLevel = hasHydrated ? currentLevel : 1
 
   return (
     <TooltipProvider>

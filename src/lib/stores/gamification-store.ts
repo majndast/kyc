@@ -10,6 +10,9 @@ interface XpGainEvent {
 }
 
 interface GamificationState {
+  // Hydration state
+  _hasHydrated: boolean
+
   // XP & Level
   totalXp: number
   currentLevel: number
@@ -37,6 +40,7 @@ interface GamificationState {
   newLevel: number | null
 
   // Actions
+  setHasHydrated: (state: boolean) => void
   addXp: (amount: number, source: string) => void
   consumeXpGain: (id: string) => void
   setDailyGoal: (goal: number) => void
@@ -59,6 +63,7 @@ function generateId(): string {
 }
 
 const initialState = {
+  _hasHydrated: false,
   totalXp: 0,
   currentLevel: 1,
   dailyXp: 0,
@@ -81,6 +86,8 @@ export const useGamificationStore = create<GamificationState>()(
   persist(
     (set, get) => ({
       ...initialState,
+
+      setHasHydrated: (state: boolean) => set({ _hasHydrated: state }),
 
       addXp: (amount: number, source: string) =>
         set((state) => {
@@ -179,6 +186,9 @@ export const useGamificationStore = create<GamificationState>()(
     }),
     {
       name: 'kyc-gamification',
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
     }
   )
 )
